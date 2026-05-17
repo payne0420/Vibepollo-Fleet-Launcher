@@ -1,5 +1,5 @@
 ;@Ahk2Exe-UpdateManifest 1 , Vibepollo Fleet Launcher
-;@Ahk2Exe-SetVersion 0.1.1
+;@Ahk2Exe-SetVersion 0.4.0
 ;@Ahk2Exe-SetName VibepolloFleet
 ;@Ahk2Exe-SetMainIcon ./icons/9.ico
 ;@Ahk2Exe-SetDescription Manage Multiple Vibepollo Streaming Instances
