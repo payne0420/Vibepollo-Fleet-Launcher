@@ -1,6 +1,9 @@
-# Apollo Fleet Launcher
+# Vibepollo Fleet Launcher
 
-A simple tool to configure multiple instances of [@ClassicOldSong/Apollo](https://github.com/ClassicOldSong/Apollo) for streaming multi monitor mode, mainly targeting desktop use case where multi devices like android tablets can be used as Plug and play external monitor.
+A simple tool to configure multiple instances of [@Nonary/Vibepollo](https://github.com/Nonary/Vibepollo) for streaming multi monitor mode, mainly targeting desktop use case where multi devices like android tablets can be used as Plug and play external monitor.
+
+> [!Note]
+> Vibepollo is an AI-enhanced fork of [Apollo](https://github.com/ClassicOldSong/Apollo) and is a drop-in replacement for it: it installs into the same `C:\Program Files\Apollo` folder, ships the same `sunshine.exe`, and registers the same `ApolloService`. Just install Vibepollo normally and point the launcher's **Vibepollo** folder field at it.
 
 This is the same concept of my old [Multi-streaming-setup](https://github.com/drajabr/My-Sunshine-setup) scripts, with ease of GUI and Auto Configuration, bundled with necessary binaries for Android clients stuff.
 
@@ -22,6 +25,11 @@ https://github.com/user-attachments/assets/72a3909f-b1c7-4aa2-bd78-3a70d3acbc61
 > If you find any issue please don't hesitate to open an issue in the repo, your feedback "and pull requests" are very welcomed.
 
 ## Changelog
+* v0.4.0 Rebranded to Vibepollo
+  * Now targets [@Nonary/Vibepollo](https://github.com/Nonary/Vibepollo), the AI-enhanced fork of Apollo
+  * Drop-in compatible: same `C:\Program Files\Apollo` install path, `sunshine.exe`, and `ApolloService` — existing setups keep working
+  * Renamed the GUI, compiled executable (`VibepolloFleet.exe`), and the logon scheduled task to "Vibepollo Fleet Launcher"
+  * Auto-removes the legacy "Apollo Fleet Launcher" scheduled task on first run to avoid double-launching instances at logon
 * v0.3.3 Bug fixes
   * FIX: Run with powershell full path to avoid errors if not defined in PATH for some reason
   * FIX: Reset window area if one monitor disconnected
@@ -100,7 +108,7 @@ https://github.com/user-attachments/assets/72a3909f-b1c7-4aa2-bd78-3a70d3acbc61
 - [x] Multi-instance: Configurable per-instance Audio Device
 - [x] Multi-instance: Sync device volume levels to all instances
 - [x] Multi-instance: Enable terminate-on-pause setting to Remove virtual display on client disconnect
-- [x] Multi-instance: Maintain Apollo instances "in case one exit/crash" 
+- [x] Multi-instance: Maintain Vibepollo instances "in case one exit/crash" 
 - [x] Multi-instance: Fix volume level sync 
 - [x] Android Clients: ADB Revrse tethering via Gnirehtet
 - [x] Android Clients: Maintain client Mic to PC using scrcpy
@@ -113,7 +121,9 @@ https://github.com/user-attachments/assets/72a3909f-b1c7-4aa2-bd78-3a70d3acbc61
 
 
 # Many thanks to:
-[@ClassicOldSong](https://github.com/ClassicOldSong) [Apollo](https://github.com/ClassicOldSong/Apollo)
+[@Nonary](https://github.com/Nonary) [Vibepollo](https://github.com/Nonary/Vibepollo)
+
+[@ClassicOldSong](https://github.com/ClassicOldSong) [Apollo](https://github.com/ClassicOldSong/Apollo) — the fork Vibepollo is built on
 
 [AutoHotKey](https://github.com/AutoHotkey) [AHK](https://autohotkey.com/) 
 

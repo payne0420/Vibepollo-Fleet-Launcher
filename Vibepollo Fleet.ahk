@@ -1,8 +1,8 @@
-;@Ahk2Exe-UpdateManifest 1 , Apollo Fleet Launcher
+;@Ahk2Exe-UpdateManifest 1 , Vibepollo Fleet Launcher
 ;@Ahk2Exe-SetVersion 0.1.1
-;@Ahk2Exe-SetName ApolloFleet
+;@Ahk2Exe-SetName VibepolloFleet
 ;@Ahk2Exe-SetMainIcon ./icons/9.ico
-;@Ahk2Exe-SetDescription Manage Multiple Apollo Streaming Instances
+;@Ahk2Exe-SetDescription Manage Multiple Vibepollo Streaming Instances
 ;@Ahk2Exe-SetCopyright Copyright (C) 2025 @drajabr
 
 #Requires Autohotkey v2
@@ -81,11 +81,13 @@ ReadSettingsFile(Settings := Map(), File := "settings.ini", groups := "all") {
                 w.restorePosition := IniRead(File, "Window", "restorePosition", 1)
             case "Paths":
                 p := Settings["Paths"]
-                p.Apollo := IniRead(File, "Paths", "Apollo", "C:\Program Files\Apollo")
+                ; Vibepollo installs into the legacy "Apollo" directory by default,
+                ; so the default path stays the same; fall back to the old "Apollo" key for in-place upgrades.
+                p.Vibepollo := IniRead(File, "Paths", "Vibepollo", IniRead(File, "Paths", "Apollo", "C:\Program Files\Apollo"))
                 p.Config := IniRead(File, "Paths", "Config", A_ScriptDir "\config")
                 p.ADBTools := IniRead(File, "Paths", "ADB", A_ScriptDir "\bin\platform-tools")
-                p.apolloExe := p.Apollo "\sunshine.exe"
-				p.ApolloFound := FileExist(p.apolloExe)
+                p.vibepolloExe := p.Vibepollo "\sunshine.exe"
+				p.VibepolloFound := FileExist(p.vibepolloExe)
                 p.gnirehtetExe := p.ADBTools "\gnirehtet.exe"
                 p.scrcpyExe := p.ADBTools "\scrcpy.exe"
                 p.adbExe := p.ADBTools "\adb.exe"
@@ -171,7 +173,7 @@ WriteSettingsFile(Settings := Map(), File := "settings.ini", groups := "all") {
 
 		if (groups = "all" || InStr(groups, "Paths")) {
 			p := Settings["Paths"]
-			changed += WriteIfChanged(File, "Paths", "Apollo", p.Apollo)
+			changed += WriteIfChanged(File, "Paths", "Vibepollo", p.Vibepollo)
 			changed += WriteIfChanged(File, "Paths", "Config", p.Config)
 			changed += WriteIfChanged(File, "Paths", "ADB", p.ADBTools)
 		}
@@ -309,7 +311,7 @@ InitmyGui() {
 	guiItems["ButtonLockSettings"].Enabled := 0
 
 	myGui.Add("GroupBox", "x318 y0 w196 h90", "Fleet Options")
-	guiItems["FleetAutoStartCheckBox"] := myGui.Add("CheckBox", "x334 y21 w162 h21", "Auto Start Apollo Fleet")
+	guiItems["FleetAutoStartCheckBox"] := myGui.Add("CheckBox", "x334 y21 w162 h21", "Auto Start Vibepollo Fleet")
 	guiItems["FleetSyncVolCheckBox"] := myGui.Add("CheckBox", "x334 y43 w162 h21", "Sync Device Volume Level")
 	guiItems["FleetRemoveDisconnectCheckbox"] := myGui.Add("CheckBox", "x334 y65 w167 h21", "Remove on Disconnect")
 
@@ -326,10 +328,10 @@ InitmyGui() {
 	guiItems["AndroidCamSelector"] := myGui.Add("DropDownList", "x382 y160 w122 Choose1", presetAndroidDevices)
 
 	myGui.Add("GroupBox", "x8 y0 w300 h192", "Fleet")
-	myGui.Add("Text", "x16 y21", "Apollo Folder:")
-	guiItems["PathsApolloBox"] := myGui.Add("Edit", "x85 y17 w190 h21")
+	myGui.Add("Text", "x16 y21", "Vibepollo:")
+	guiItems["PathsVibepolloBox"] := myGui.Add("Edit", "x85 y17 w190 h21")
 	myGui.SetFont("s14")
-	guiItems["PathsApolloIndicator"] := myGui.Add("Text", "x278 y15", "⚠️")
+	guiItems["PathsVibepolloIndicator"] := myGui.Add("Text", "x278 y15", "⚠️")
 	myGui.SetFont()
 
 	guiItems["FleetListBox"] := myGui.Add("ListBox", "x16 y50 w100 h82 +0x100 Choose1")
@@ -358,15 +360,15 @@ InitmyGui() {
 	guiItems["FleetButtonAdd"] := myGui.Add("Button", "x43 y139 w74 h21", "Add")
 	guiItems["FleetButtonDelete"] := myGui.Add("Button", "x15 y139 w26 h21", "✖")
 
-	guiItems["StatusApollo"] := myGui.Add("Text", "x16 y172 w70", "❎ Apollo ")
-	guiItems["StatusGnirehtet"] := myGui.Add("Text", "x76 y172 w70", "❎ Gnirehtet")
-	guiItems["StatusAndroidMic"] := myGui.Add("Text", "x146 y172 w75", "❎ AndroidMic")
-	guiItems["StatusAndroidCam"] := myGui.Add("Text", "x226 y172 w75", "❎ AndroidCam")
+	guiItems["StatusVibepollo"] := myGui.Add("Text", "x16 y172 w74", "❎ Vibepollo ")
+	guiItems["StatusGnirehtet"] := myGui.Add("Text", "x90 y172 w70", "❎ Gnirehtet")
+	guiItems["StatusAndroidMic"] := myGui.Add("Text", "x160 y172 w72", "❎ AndroidMic")
+	guiItems["StatusAndroidCam"] := myGui.Add("Text", "x232 y172 w74", "❎ AndroidCam")
 	guiItems["StatusMessage"] := myGui.Add("Text", "x16 y172 w290")
 	ShowMessage("Initialized All GUI Elements")
 
 	guiItems["LogTextBox"] := myGui.Add("Edit", "x8 y199 w562 h393 -VScroll +ReadOnly")
-	myGui.Title := "Apollo Fleet Manager"
+	myGui.Title := "Vibepollo Fleet Manager"
 
 	if savedSettings["Manager"].DarkTheme {
 		TryEnableDarkMode(myGui, guiItems)
@@ -452,7 +454,7 @@ ReflectSettings(Settings){
 	guiItems["AndroidMicSelector"].Text := a.MicDeviceID
 	guiItems["AndroidCamCheckbox"].Value := a.CamEnable
 	guiItems["AndroidCamSelector"].Text := a.CamDeviceID
-	guiItems["PathsApolloBox"].Value := Settings["Paths"].Apollo
+	guiItems["PathsVibepolloBox"].Value := Settings["Paths"].Vibepollo
 	guiItems["ButtonLogsShow"].Text := (transientSettings["Window"].logShow = 1 ? "Hide Logs" : "Show Logs")
 	;guiItems["InstanceAudioSelector"].Enabled :=0
 	guiItems["FleetListBox"].Delete()
@@ -507,36 +509,36 @@ InitGuiItemsEvents(){
 	guiItems["InstancePortBox"].OnEvent("Change", StrictPortLimits)
 	guiItems["InstanceAudioSelector"].OnEvent("Change", HandleAudioSelector)
 
-	guiItems["PathsApolloBox"].OnEvent("Change", HandlePathChange)
+	guiItems["PathsVibepolloBox"].OnEvent("Change", HandlePathChange)
 
 	OnMessage(0x404, TrayIconHandler)
 	guiItems["FleetListBox"].Enabled := 1
 	guiItems["ButtonReload"].Enabled := 1
 	guiItems["ButtonLockSettings"].Enabled := 1
 }
-CheckApolloFound(){
+CheckVibepolloFound(){
 	global guiItems, userSettings
-	path := guiItems["PathsApolloBox"].Value
+	path := guiItems["PathsVibepolloBox"].Value
 	if !FileExist(path . "\sunshine.exe") {
-		guiItems["PathsApolloIndicator"].Text := "⚠️"
-		ShowMessage("Apollo not found in selected folder", 3)
-		userSettings["Paths"].ApolloFound := 0
+		guiItems["PathsVibepolloIndicator"].Text := "⚠️"
+		ShowMessage("Vibepollo not found in selected folder", 3)
+		userSettings["Paths"].VibepolloFound := 0
 		return false
 	}
-	guiItems["PathsApolloIndicator"].Text := "✅"
-	userSettings["Paths"].Apollo := path
-	guiItems["PathsApolloBox"].Value := path
-	userSettings["Paths"].ApolloFound := 1
+	guiItems["PathsVibepolloIndicator"].Text := "✅"
+	userSettings["Paths"].Vibepollo := path
+	guiItems["PathsVibepolloBox"].Value := path
+	userSettings["Paths"].VibepolloFound := 1
 	return true
 }
 HandlePathChange(*){
 	global guiItems, userSettings
-	path := guiItems["PathsApolloBox"].Value
-	if !CheckApolloFound()
+	path := guiItems["PathsVibepolloBox"].Value
+	if !CheckVibepolloFound()
 		return
-	userSettings["Paths"].Apollo := path
-	guiItems["PathsApolloBox"].Value := path
-}	
+	userSettings["Paths"].Vibepollo := path
+	guiItems["PathsVibepolloBox"].Value := path
+}
 CheckAdbRefresh(){
 	userRequire := userSettings["Android"].MicEnable || userSettings["Android"].CamEnable
 	if userRequire && !adbReady
@@ -759,7 +761,7 @@ DeleteAllTimers(){
 	for i in savedSettings["Fleet"] {
 		if i.Enabled {
 			DeleteLogWatchTimer(i.id)
-			DeleteApolloMaintainTimer(i.id)
+			DeleteVibepolloMaintainTimer(i.id)
 		}
 	}
 	SetTimer(MaintainGnirehtetProcess, 0)
@@ -901,7 +903,7 @@ UpdateButtonsLabels(){
 	i := userSettings["Fleet"][currentlySelectedIndex]
 	pid := transientSettings["Fleet"].has(i.id) ? transientSettings["Fleet"][i.id] : 0
 	guiItems["InstanceEnableCheckbox"].Text := i.Enabled ? ProcessExist(pid)  ? "Running: " pid "" : "Stopped" :  ProcessExist(pid) ? "To be Disabled" : "Disabled"
-	CheckApolloFound()
+	CheckVibepolloFound()
 	guiItems["InstanceHeadlessCheckbox"].Text := (i.HeadlessModeSet = "enabled" ? "Force Enabled" : "Force Disabled")
 }
 ApplyLockState() {
@@ -910,7 +912,7 @@ ApplyLockState() {
 	isEnabled(cond := true) => cond ? 1 : 0
 	isReadOnly(cond := true) => cond ? "+ReadOnly" : "-ReadOnly"
 
-	textBoxes := ["PathsApolloBox"]
+	textBoxes := ["PathsVibepolloBox"]
 	checkBoxes := ["InstanceEnableCheckbox", "FleetAutoStartCheckBox", "AndroidReverseTetheringCheckbox", "AndroidMicCheckbox", "AndroidCamCheckbox", "FleetSyncVolCheckBox", "FleetRemoveDisconnectCheckbox", "InstanceHeadlessCheckbox"]
 	buttons := ["FleetButtonDelete", "FleetButtonAdd"]
 	androidSelectors := Map(
@@ -1319,7 +1321,7 @@ RunPsExecAndGetPID(exePath, args := "", id := 0) {
     workingDir := SubStr(exePath, 1, InStr(exePath, "\",, -1) - 1)
     psexecPath := savedSettings["Paths"].paexecExe
     sessionId := DllCall("Kernel32.dll\WTSGetActiveConsoleSessionId")
-    tmpFile := A_Temp "\apollo-fleet-" id ".txt"
+    tmpFile := A_Temp "\vibepollo-fleet-" id ".txt"
     
     ; Delete any existing file first
     if FileExist(tmpFile)
@@ -1390,7 +1392,7 @@ CleanConfigAndKillPIDs() {
 MaintainInstanceTimer(id){
 	SetTimer(() => MaintainInstance(id), 5000)
 }
-DeleteApolloMaintainTimer(id){
+DeleteVibepolloMaintainTimer(id){
 	SetTimer(() => MaintainInstance(id), 0)
 }
 MaintainInstance(id) {
@@ -1398,10 +1400,10 @@ MaintainInstance(id) {
 	static lastPid := 0
 	running[id] := true
 	i := savedSettings["Fleet"][id]
-	if !(userSettings["Paths"].ApolloFound && FileExist(i.configFile) && FileExist(i.appsFile))
+	if !(userSettings["Paths"].VibepolloFound && FileExist(i.configFile) && FileExist(i.appsFile))
 		return
-	else if !ProcessExist(transientSettings["Fleet"][id]) 
-		transientSettings["Fleet"][id] := RunPsExecAndGetPID(savedSettings["Paths"].apolloExe, i.configFile, id)
+	else if !ProcessExist(transientSettings["Fleet"][id])
+		transientSettings["Fleet"][id] := RunPsExecAndGetPID(savedSettings["Paths"].vibepolloExe, i.configFile, id)
 	if !transientSettings["Fleet"][id] != lastPid{
 		lastPid := transientSettings["Fleet"][id]
 		ShowMessage("Starting " i.Name " with PID: " transientSettings["Fleet"][id])
@@ -1411,10 +1413,18 @@ MaintainInstance(id) {
 }
 
 SetupFleetTask() {
-    taskName := "Apollo Fleet Launcher"
+    taskName := "Vibepollo Fleet Launcher"
     exePath := A_ScriptFullPath
     AutoStart := savedSettings["Manager"].AutoStart
-    
+
+    ; Remove the legacy scheduled task from pre-Vibepollo "Apollo Fleet" builds
+    ; so it can't double-launch instances at logon alongside the renamed task.
+    try {
+        legacySvc := ComObject("Schedule.Service")
+        legacySvc.Connect()
+        legacySvc.GetFolder("\").DeleteTask("Apollo Fleet Launcher", 0)
+    }
+
 	if RunWait("cmd /c sc query ApolloService >nul 2>&1", , "Hide") == 0 {
 		if AutoStart {
 			RunWait('sc stop ApolloService', , "Hide")
@@ -1458,7 +1468,7 @@ SetupFleetTask() {
 			action.Path := A_IsCompiled ? exePath : A_AhkPath
 			action.Arguments := A_IsCompiled ? "" : '"' exePath '"'
 
-			taskDef.RegistrationInfo.Description := "Apollo Fleet Manager"
+			taskDef.RegistrationInfo.Description := "Vibepollo Fleet Manager"
 			taskDef.Settings.Enabled := true
 			taskDef.Settings.StartWhenAvailable := true
 
@@ -1562,12 +1572,12 @@ UpdateStatusArea() {
 
 	if  msgTimeout {
 		valid := f.Length > 0
-		apolloRunning := valid ? 1 : 0
+		vibepolloRunning := valid ? 1 : 0
 		for i in f {
 			if i.Enabled = 0
 				continue
 			else if !ProcessRunning(transientSettings["Fleet"][i.id]) {
-				apolloRunning := 0
+				vibepolloRunning := 0
 				break
 			}
 		}
@@ -1576,7 +1586,7 @@ UpdateStatusArea() {
 		androidCamRunning := ProcessRunning(transientSettings["Android"].scrcpyCamPID)
 
 		statusItems := Map(
-			"StatusApollo", "apolloRunning",
+			"StatusVibepollo", "vibepolloRunning",
 			"StatusGnirehtet", "gnirehtetRunning",
 			"StatusAndroidMic", "androidMicRunning",
 			"StatusAndroidCam", "androidCamRunning"
@@ -1632,20 +1642,20 @@ LogMessage(msg, level, show:=0, timeout:=1000){
 }
 ; TODO LOGGING from all functions
 
-FleetInitApolloLogWatch() {
+FleetInitVibepolloLogWatch() {
     global savedSettings
 
     for i in savedSettings["Fleet"]
-        if i.Enabled 
+        if i.Enabled
 			CreateTimerForInstance(i.id)
 }
 CreateTimerForInstance(id) {
-    SetTimer(() => ProcessApolloLog(id), 500)
+    SetTimer(() => ProcessVibepolloLog(id), 500)
 }
 DeleteLogWatchTimer(id){
-	SetTimer(() => ProcessApolloLog(id), 0)
+	SetTimer(() => ProcessVibepolloLog(id), 0)
 }
-ProcessApolloLog(id) {
+ProcessVibepolloLog(id) {
 	global savedSettings
 	static LastReadLogLine := 0
 	if savedSettings["Fleet"].Length < id
@@ -1683,7 +1693,7 @@ ProcessApolloLog(id) {
     return 0
 }
 
-SyncApolloVolume(){
+SyncVibepolloVolume(){
 	global savedSettings, transientSettings
 
 	static lastSystemVolume := -1
@@ -1836,15 +1846,15 @@ MaintainScrcpyProcess(targetDevice := "Mic") {
 
 
 
-bootstrapApollo(){
-	global savedSettings, guiItems, currentlySelectedIndex, apolloBootsraped
+bootstrapVibepollo(){
+	global savedSettings, guiItems, currentlySelectedIndex, vibepolloBootsraped
 	SetupFleetTask()
 	FleetConfigInit()
 	FleetLaunchFleet()
-	FleetInitApolloLogWatch()
+	FleetInitVibepolloLogWatch()
 	if savedSettings["Manager"].SyncVolume
-		SetTimer(SyncApolloVolume, 100)
-	apolloBootsraped := true
+		SetTimer(SyncVibepolloVolume, 100)
+	vibepolloBootsraped := true
 	FinishBootStrap()
 }
 
@@ -1909,8 +1919,8 @@ if !savedSettings["Manager"].ShowErrors{
 	}
 }
 
-global apolloBootsraped := false
-SetTimer(bootstrapApollo, -1)
+global vibepolloBootsraped := false
+SetTimer(bootstrapVibepollo, -1)
 
 global gnirehtetBootsraped := false
 SetTimer(bootstrapGnirehtet, -1)
@@ -1921,8 +1931,8 @@ SetTimer(bootstrapAndroid, -1)
 SetTimer UpdateStatusArea, 1000
 
 FinishBootStrap() {
-	global apolloBootsraped, gnirehtetBootsraped, androidBootsraped
-	if !apolloBootsraped || !androidBootsraped || !gnirehtetBootsraped
+	global vibepolloBootsraped, gnirehtetBootsraped, androidBootsraped
+	if !vibepolloBootsraped || !androidBootsraped || !gnirehtetBootsraped
 		return false
 	InitGuiItemsEvents()
 	ResetFlags()
